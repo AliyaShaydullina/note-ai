@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f7f8fc">
+  <title>Note AI — умные конспекты</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--ink:#172033;--muted:#788196;--blue:#5267ed;--line:#e8eaf2;--bg:#f7f8fc}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:"DM Sans",sans-serif}
+    .shell{max-width:1160px;margin:auto;padding:26px 28px 60px}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:58px}
+    .brand{display:flex;align-items:center;gap:11px;font:800 23px Manrope,sans-serif;letter-spacing:-.8px}
+    .logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(145deg,#6578ff,#4854d9);display:grid;place-items:center;color:white;box-shadow:0 7px 18px #5267ed40}
+    .logo svg{width:22px;height:22px}.tag{font-size:13px;color:#667085;background:#fff;border:1px solid var(--line);padding:9px 14px;border-radius:30px}
+    .hero{text-align:center;margin-bottom:34px}.eyebrow{display:inline-flex;align-items:center;gap:7px;color:#5365e8;background:#eef0ff;border-radius:30px;padding:7px 12px;font-size:12px;font-weight:700;letter-spacing:.2px}
+    h1{font:800 clamp(34px,5vw,54px)/1.12 Manrope,sans-serif;letter-spacing:-2px;margin:18px 0 12px}
+    h1 span{color:var(--blue)}.sub{font-size:16px;line-height:1.6;color:var(--muted);max-width:590px;margin:auto}
+    .workspace{display:grid;grid-template-columns:390px 1fr;gap:20px;align-items:start}
+    .panel{background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:0 8px 30px #18234a08;min-width:0}
+    .form-panel{padding:25px}.panel-title{font:700 18px Manrope,sans-serif;margin:0 0 5px}.panel-desc{font-size:13px;color:var(--muted);margin:0 0 23px}
+    label{display:block;font-size:13px;font-weight:700;margin:0 0 8px}.field{margin-bottom:18px}
+    input,select,textarea{width:100%;border:1px solid #e3e6ef;border-radius:12px;padding:13px 14px;background:#fff;color:var(--ink);font:14px "DM Sans",sans-serif;outline:none;transition:.2s}
+    input:focus,select:focus,textarea:focus{border-color:#8491ff;box-shadow:0 0 0 3px #5267ed16}
+    textarea{resize:vertical;min-height:112px;line-height:1.5}input::placeholder,textarea::placeholder{color:#a5adbd}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .hint{font-size:11px;color:#929bad;margin-top:7px;line-height:1.45}
+    .generate{width:100%;border:0;border-radius:13px;padding:15px;background:linear-gradient(110deg,#596ef5,#4857dc);color:#fff;font:700 14px "DM Sans";cursor:pointer;box-shadow:0 8px 18px #5267ed35;transition:.2s}
+    .generate:hover{transform:translateY(-1px);box-shadow:0 11px 22px #5267ed40}.generate:disabled{opacity:.65;cursor:wait;transform:none}
+    .secure{text-align:center;color:#9aa2b2;font-size:11px;margin:12px 0 0}
+    .result{min-height:530px;padding:25px;min-width:0}.result-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+    .result-label{font:700 17px Manrope,sans-serif}.status{font-size:11px;color:#6874df;background:#f0f1ff;padding:7px 10px;border-radius:30px;white-space:nowrap}
+    .empty{min-height:420px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:35px}
+    .empty-icon{width:76px;height:76px;border-radius:24px;background:#f0f2ff;color:#6574ee;display:grid;place-items:center;margin-bottom:18px}
+    .empty-icon svg{width:34px;height:34px}.empty h3{font:700 18px Manrope;margin:0 0 8px}.empty p{max-width:310px;font-size:13px;line-height:1.6;color:var(--muted);margin:0}
+    .notes{padding:22px 3px 5px;font-size:14px;line-height:1.75;white-space:pre-wrap;overflow-wrap:anywhere}
+    .notes h2,.notes h3{font-family:Manrope,sans-serif;line-height:1.3}.actions{display:flex;gap:8px}
+    .small-btn{border:1px solid var(--line);background:white;color:#626d82;padding:8px 11px;border-radius:9px;font-size:12px;cursor:pointer}
+    .small-btn:hover{background:#f7f8ff}.error{color:#b54747;background:#fff3f2;border:1px solid #f8d7d4;border-radius:12px;padding:13px;font-size:13px;margin-top:18px}
+    .loader{display:flex;align-items:center;gap:10px;color:#6974d9;font-size:13px;padding:30px 4px}.spinner{width:18px;height:18px;border:2px solid #dfe3ff;border-top-color:#596ef5;border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+    footer{text-align:center;color:#a0a7b5;font-size:12px;margin-top:28px}
+    @media(max-width:850px){
+      .workspace{grid-template-columns:minmax(0,1fr);gap:16px}
+      .form-panel{order:0}
+      .result{min-height:400px}
+      .empty{min-height:300px}
+      header{margin-bottom:38px}
+    }
+    @media(max-width:600px){
+      html{-webkit-text-size-adjust:100%;}
+      body{min-width:320px;}
+      .shell{width:100%;padding:16px 12px calc(30px + env(safe-area-inset-bottom));}
+      header{margin-bottom:30px;gap:10px;}
+      .brand{font-size:21px;gap:9px;}
+      .logo{width:39px;height:39px;border-radius:13px;}
+      .tag{font-size:10px;padding:7px 9px;white-space:normal;text-align:center;max-width:145px;line-height:1.3;}
+      .hero{margin-bottom:24px;}
+      .eyebrow{font-size:10px;padding:7px 10px;}
+      h1{font-size:clamp(32px,9vw,43px);letter-spacing:-1.5px;margin:15px 0 10px;}
+      .sub{font-size:14px;line-height:1.55;padding:0 4px;}
+      .workspace{gap:14px;}
+      .panel{border-radius:18px;}
+      .form-panel,.result{padding:17px;}
+      .panel-title{font-size:17px;}
+      .panel-desc{font-size:12px;margin-bottom:20px;}
+      label{font-size:13px;margin-bottom:8px;}
+      .field{margin-bottom:16px;}
+      input,select,textarea{font-size:16px;min-height:48px;padding:12px;border-radius:11px;}
+      textarea{min-height:116px;line-height:1.5;}
+      .two{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;}
+      .hint{font-size:11px;line-height:1.5;}
+      .generate{min-height:52px;padding:14px 12px;font-size:15px;border-radius:12px;touch-action:manipulation;}
+      .secure{font-size:10px;line-height:1.45;}
+      .result{min-height:340px;min-width:0;}
+      .result-head{display:flex;flex-wrap:wrap;align-items:center;gap:9px;padding-bottom:14px;}
+      .result-label{font-size:16px;order:1;}
+      .status{order:2;font-size:9px;padding:6px 8px;white-space:normal;text-align:center;margin-left:auto;max-width:48%;}
+      .actions{order:3;flex:0 0 100%;width:100%;display:flex;gap:8px;}
+      .actions[hidden]{display:none;}
+      .small-btn{flex:1;min-height:40px;padding:9px 8px;font-size:12px;}
+      .empty{min-height:275px;padding:22px 10px;}
+      .empty-icon{width:64px;height:64px;border-radius:20px;margin-bottom:15px;}
+      .empty h3{font-size:17px;}
+      .empty p{font-size:12px;line-height:1.55;}
+      .notes{padding:17px 1px 4px;font-size:14px;line-height:1.7;overflow-wrap:anywhere;word-break:normal;}
+      .loader{font-size:12px;line-height:1.5;padding:24px 2px;}
+      .error{font-size:12px;line-height:1.5;overflow-wrap:anywhere;}
+      footer{font-size:11px;line-height:1.5;margin-top:22px;}
+    }
+    @media(max-width:380px){
+      .tag{max-width:118px;font-size:9px;}
+      .two{grid-template-columns:1fr;gap:0;}
+      .form-panel,.result{padding:15px;}
+      .status{max-width:45%;}
+      .small-btn{font-size:11px;}
+    }
+    @media(hover:none){
+      .generate:hover{transform:none;box-shadow:0 8px 18px #5267ed35;}
+      .small-btn:hover{background:#fff;}
+    }
+    @media(prefers-reduced-motion:reduce){
+      *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}
+    }
+  </style>
+</head>
+<body>
+<div class="shell">
+  <header>
+    <div class="brand"><div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h6"/></svg></div>Note AI</div>
+    <div class="tag">✦ Твой помощник в учёбе</div>
+  </header>
+  <section class="hero">
+    <div class="eyebrow">✦ УЧЁБА СТАНОВИТСЯ ПРОЩЕ</div>
+    <h1>Твой конспект.<br><span>За пару секунд.</span></h1>
+    <p class="sub">Расскажи, какую тему нужно изучить, — Note AI подготовит понятный и подробный конспект с ответами на твои вопросы.</p>
+  </section>
+  <main class="workspace">
+    <section class="panel form-panel">
+      <h2 class="panel-title">Новый конспект</h2>
+      <p class="panel-desc">Заполни несколько полей, остальное сделает ИИ.</p>
+      <form id="noteForm">
+        <div class="field">
+          <label for="topic">Тема конспекта</label>
+          <input id="topic" required maxlength="300" placeholder="Например: Машиностроение">
+        </div>
+        <div class="two">
+          <div class="field">
+            <label for="subject">Предмет</label>
+            <select id="subject">
+              <option>География</option><option>История</option><option>Биология</option><option>Обществознание</option><option>Физика</option><option>Химия</option><option>Литература</option><option>Информатика</option><option>Другое</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="grade">Класс</label>
+            <select id="grade">
+              <option>5 класс</option><option>6 класс</option><option selected>7 класс</option><option>8 класс</option><option>9 класс</option><option>10 класс</option><option>11 класс</option><option>Колледж</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="questions">Ключевые вопросы и слова <span style="font-weight:400;color:#929bad">(необязательно)</span></label>
+          <textarea id="questions" maxlength="2000" placeholder="Например:
+• Где производят машины?
+• Кто работает в машиностроении?
+• Когда возникла эта отрасль?
+• Какие бывают виды машиностроения?"></textarea>
+          <div class="hint">Напиши, на что особенно важно обратить внимание. ИИ постарается ответить на каждый пункт.</div>
+        </div>
+        <button class="generate" id="submitBtn" type="submit">✦ Создать конспект</button>
+        <p class="secure">Твои вопросы используются только для создания конспекта</p>
+      </form>
+    </section>
+    <section class="panel result">
+      <div class="result-head">
+        <div class="result-label">Твой результат</div>
+        <div class="actions" id="actions" hidden>
+          <button class="small-btn" id="copyBtn">Копировать</button>
+          <button class="small-btn" id="downloadBtn">Скачать .txt</button>
+        </div>
+        <span class="status" id="status">ОЖИДАЕТ ЗАПРОСА</span>
+      </div>
+      <div id="output">
+        <div class="empty">
+          <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></svg></div>
+          <h3>Здесь появится твой конспект</h3>
+          <p>Укажи тему, выбери предмет и класс. Можешь добавить свои вопросы, чтобы получить именно ту информацию, которая нужна.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer>Note AI · Учись эффективнее, понимай больше</footer>
+</div>
+<script>
+const form=document.getElementById('noteForm'), output=document.getElementById('output');
+const statusEl=document.getElementById('status'), btn=document.getElementById('submitBtn');
+const actions=document.getElementById('actions');
+let latestNotes='';
+form.addEventListener('submit',async e=>{
+  e.preventDefault();
+  const payload={topic:document.getElementById('topic').value.trim(),subject:document.getElementById('subject').value,grade:document.getElementById('grade').value,questions:document.getElementById('questions').value.trim()};
+  if(!payload.topic)return;
+  btn.disabled=true;btn.textContent='Создаём конспект…';statusEl.textContent='ИИ РАБОТАЕТ';actions.hidden=true;
+  output.innerHTML='<div class="loader"><span class="spinner"></span>Подбираем материал и структурируем ответы…</div>';
+  try{
+    const response=await fetch('/api/notes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const data=await response.json();
+    if(!response.ok)throw new Error(data.error||'Не удалось создать конспект.');
+    latestNotes=data.notes;const pre=document.createElement('div');pre.className='notes';pre.textContent=latestNotes;output.replaceChildren(pre);
+    statusEl.textContent='КОНСПЕКТ ГОТОВ';actions.hidden=false;
+  }catch(err){
+    output.innerHTML='';const box=document.createElement('div');box.className='error';box.textContent=err.message;output.append(box);statusEl.textContent='ТРЕБУЕТСЯ НАСТРОЙКА';
+  }finally{btn.disabled=false;btn.textContent='✦ Создать конспект';}
+});
+document.getElementById('copyBtn').addEventListener('click',async()=>{if(latestNotes){await navigator.clipboard.writeText(latestNotes);document.getElementById('copyBtn').textContent='Скопировано ✓';setTimeout(()=>document.getElementById('copyBtn').textContent='Копировать',1600)}});
+document.getElementById('downloadBtn').addEventListener('click',()=>{if(!latestNotes)return;const blob=new Blob([latestNotes],{type:'text/plain;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='note-ai-конспект.txt';a.click();URL.revokeObjectURL(url)});
+</script>
+</body>
+</html>
